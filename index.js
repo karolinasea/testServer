@@ -106,7 +106,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		else {
 			usersDataBase = JSON.parse(data);
 			
-			usersDataBase.table.push({id: 2, square:3});
+			usersDataBase.users.push(newObject);
 			
 			json = JSON.stringify(usersDataBase); 
 			
