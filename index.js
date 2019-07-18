@@ -11,43 +11,66 @@ res.send('Chat Server is running on port 3000')
 
 var userList = [];
 
+var usersDataBase = {
+		users: []
+	}; 
+	
+
 io.on('connection', (socket) => {
 
 console.log('user connected')
 
 
-socket.on('join', function(userNickname) {
+socket.on('join', function(userNickname) 
+{
 
         console.log(userNickname +" : has joined the chat "  );
         socket.broadcast.emit('userjoinedthechat',userNickname +" : has joined the chat ");
         
         var userInfo = {};
       	var foundUser = false;
-      	for (var i=0; i<userList.length; i++) {
-        if (userList[i]["nickname"] == userNickname) {
-          userList[i]["isConnected"] = true
-          // userList[i]["id"] = clientSocket.id;
-          userInfo = userList[i];
-          foundUser = true;
-          break;
-        }
-      }
+      	for (var i=0; i<userList.length; i++) 
+      	{
+        	if (userList[i]["nickname"] == userNickname) 
+       	    {
+          		userList[i]["isConnected"] = true
+          		userInfo = userList[i];
+          		foundUser = true;
+          		break;
+        	}
+        }	
 
-      if (!foundUser) {
-//         userInfo["id"] = clientSocket.id;
-        userInfo["nickname"] = userNickname;
-        userInfo["isConnected"] = true
-        userList.push(userInfo);
-      }
+       if (!foundUser) 
+       {
+        	userInfo["nickname"] = userNickname;
+        	userInfo["isConnected"] = true
+        	userList.push(userInfo);
+        }
 
       io.emit("userList", userList);
       io.emit("connectedUsersList", userList);
       io.emit("userConnectUpdate", userInfo)
       
       //afficher list des user sur la console
-      for (var i=0; i<userList.length; i++) {
-      console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+      for (var i=0; i<userList.length; i++) 
+      {
+      	console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
       }
+      
+      socket.on('disconnect', function() 
+      {
+      	 console.log(userNickname +' has left ')
+        for (var i=0; i<userList.length; i++) 
+        {
+        	if (userList[i]["nickname"] == userNickname) 
+        	{
+          		userList[i]["isConnected"] = false
+          		break;
+          	}
+        }
+		io.emit("userList", userList);
+        socket.broadcast.emit( "userdisconnect" ,' user has left')
+    })
       
     })
 
@@ -67,18 +90,34 @@ socket.on('messagedetection', (senderNickname,messageContent) => {
       io.emit('message', message )
 
       })
-
-socket.on('disconnect', function() {
-
-        // console.log(userNickname +' has left ')
-        console.log('one user has left ')
-
-        socket.broadcast.emit( "userdisconnect" ,' user has left')
-
-    })
+      
+socket.on('newUser', (newUserName, newPassword) => 
+{
+		var newObject = {}; 		
+		newObject['userName'] = newUserName;
+		newObject['passWord'] = newPassword;
+		console.log("new user : " + newUserName+ ", password : " + newPassword); 
+		var json = JSON.stringify(newObject); 
+		var fs = require('fs');
+		fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data){
+		if (err){
+			console.log(err);
+		} 
+		else {
+			usersDataBase = JSON.parse(data);
+			
+			usersDataBase.table.push({id: 2, square:3});
+			
+			json = JSON.stringify(usersDataBase); 
+			
+			fs.writeFile('usersDataBase.json', json, 'utf8', callback); // write it back 
+		}});
+		
 sendTo(socket, userList);
 })
 
+}
+)
 
 
 server.listen(3000,()=>{
