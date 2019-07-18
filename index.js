@@ -12,8 +12,8 @@ res.send('Chat Server is running on port 3000')
 var userList = [];
 
 var usersDataBase = {
-		"users": []
 	}; 
+var users = [];
 	
 
 io.on('connection', (socket) => {
@@ -99,18 +99,20 @@ socket.on('newUser', (newUserName, newPassword) =>
 		console.log("new user : " + newUserName+ ", password : " + newPassword); 
 		var json = JSON.stringify(newObject); 
 		var fs = require('fs');
-		fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data){
-		if (err){
-			console.log(err);
-		} 
-		else {
-			usersDataBase = JSON.parse(data);
+		var fs = require('fs');
+		fs.writeFile('myjsonfile.json', json, 'utf8', callback);
+// 		fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data){
+// 		if (err){
+// 			console.log(err);
+// 		} 
+// 		else {
+// 			usersDataBase = JSON.parse(data);
 			
-			usersDataBase.users.push(newObject);
+// 			users.push(newObject);
 			
-			json = JSON.stringify(usersDataBase); 
+// 			json = JSON.stringify(usersDataBase); 
 			
-			fs.writeFile('usersDataBase.json', json, 'utf8', callback); // write it back 
+// 			fs.writeFile('usersDataBase.json', json, 'utf8', callback); // write it back 
 		}});
 		
 sendTo(socket, userList);
