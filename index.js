@@ -12,7 +12,7 @@ res.send('Chat Server is running on port 3000')
 var userList = [];
 
 var usersDataBase = {
- 	'users = []';
+//  	users = [];
 	}; 
 	
 
@@ -111,9 +111,15 @@ socket.on('newUser', (newUserName, newPassword) =>
 			
 			json = JSON.stringify(usersDataBase); 
 			
-			fs.writeFile('usersDataBase.json', json, 'utf8', callback); // write it back 
-		}});
-		
+			fs.writeFile('usersDataBase.json', json, 'utf8',function (err) {
+		   	if (err) {
+			return console.log(err);
+		    	}
+			else {
+		    	console.log("The file was saved!"); // write it back 
+			}
+}});
+
 sendTo(socket, userList);
 })
 
