@@ -12,7 +12,7 @@ res.send('Chat Server is running on port 3000')
 var userList = [];
 
 var usersDataBase = {
-		users: []
+		"users": []
 	}; 
 	
 
