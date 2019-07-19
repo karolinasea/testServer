@@ -21,20 +21,29 @@ var usersDataBase =
 
 io.on('connection', (socket) => 
 {
-
-      socket.on("connectionAttempt", function(data)
+      socket.on('connectionAttempt', function(data)
         {
         io.emit("connected", data)      
             console.log("user connected : id = " + data)
       })
+
       console.log('user connected')
+
+
+      var fs = require('fs');
+      socket.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
+
+      // var fs = require('fs');
+      // var arr = JSON.parse(fs.readFileSync("usersDataBase.json", "utf8"));
+      // io.emit("testList", arr); //prints the json on xcode console
+
 
       socket.on('join', function(userName) 
       {
             console.log(userName +" : has joined the chat "  );
             socket.broadcast.emit('userjoinedthechat',userName +" : has joined the chat ");
                   
-            // var userInfo = {};
+            var userInfo = {};
             var foundUser = false;
             for (var i=0; i<userList.length; i++) 
             {
@@ -55,8 +64,8 @@ io.on('connection', (socket) =>
             }
 
             io.emit("userList", userList);
-            // io.emit("connectedUsersList", userList);
-            // io.emit("userConnectUpdate", userInfo)
+            io.emit("connectedUsersList", userList);
+            io.emit("userConnectUpdate", userInfo)
                 
             //afficher list des user sur la console
             console.log("Online users after join:"); 
@@ -108,7 +117,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
                 {
                   console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
                 }
-            }); 
+}); 
 
 socket.on('messagedetection', (senderNickname,messageContent) => 
 {
@@ -125,9 +134,10 @@ socket.on('messagedetection', (senderNickname,messageContent) =>
       
 socket.on('newUser', (newUserName, newPassword) => 
 {
-    // var newObject = {};     
+    var userInfo = {};     
     userInfo['userName'] = newUserName;
     userInfo['passWord'] = newPassword;
+    userInfo["isConnected"] = false
     console.log("new user : " + newUserName+ ", password : " + newPassword); 
     var json = JSON.stringify(userInfo); 
     var fs = require('fs');
@@ -142,7 +152,7 @@ socket.on('newUser', (newUserName, newPassword) =>
         {
           usersDataBase = JSON.parse(data);
           
-          usersDataBase.userList.push(userInfo);
+          usersDataBase.users.push(userInfo);
           
           json = JSON.stringify(usersDataBase); 
           
@@ -159,7 +169,9 @@ socket.on('newUser', (newUserName, newPassword) =>
           })
         }
       })
+    userList.push(userInfo); //put the new user in the list 
   })
+
 
   sendTo(socket, userList);
 })
