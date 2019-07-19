@@ -11,64 +11,67 @@ app.get('/', (req, res) =>
 
 var userList = [];
 
+var userInfo = {};
+
 var usersDataBase = 
 {
-  //  	users = [];
+  //    users = [];
 }; 
-	
+  
 
 io.on('connection', (socket) => 
 {
-	socket.on(connectionAttempt", function(data)
-		  {
-		  io.emit("connected", data)			
-    		  console.log("user connected : id = " + data)
-		}
+
+      socket.on("connectionAttempt", function(data)
+        {
+        io.emit("connected", data)      
+            console.log("user connected : id = " + data)
+      })
       console.log('user connected')
 
-      socket.on('join', function(userNickname) 
+      socket.on('join', function(userName) 
       {
-            console.log(userNickname +" : has joined the chat "  );
-            socket.broadcast.emit('userjoinedthechat',userNickname +" : has joined the chat ");
+            console.log(userName +" : has joined the chat "  );
+            socket.broadcast.emit('userjoinedthechat',userName +" : has joined the chat ");
                   
-            var userInfo = {};
+            // var userInfo = {};
             var foundUser = false;
             for (var i=0; i<userList.length; i++) 
             {
-              if (userList[i]["nickname"] == userNickname) 
+              if (userList[i]["userName"] == userName) 
               {
                 userList[i]["isConnected"] = true
                 userInfo = userList[i];
                 foundUser = true;
                 break;
               }
-            }	
+            } 
 
             if (!foundUser) 
             {
-              userInfo["nickname"] = userNickname;
+              userInfo["userName"] = userName;
               userInfo["isConnected"] = true
               userList.push(userInfo);
             }
 
             io.emit("userList", userList);
-            io.emit("connectedUsersList", userList);
-            io.emit("userConnectUpdate", userInfo)
+            // io.emit("connectedUsersList", userList);
+            // io.emit("userConnectUpdate", userInfo)
                 
             //afficher list des user sur la console
             console.log("Online users after join:"); 
             for (var i=0; i<userList.length; i++) 
             {
-              console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+              console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
             }
                
                 
             socket.on('disconnect', function() 
             {
-              console.log(userNickname +' has left ')
+              console.log(userName +' has left ')
               for (var i=0; i<userList.length; i++) 
               {
-                if (userList[i]["nickname"] == userNickname) 
+                if (userList[i]["userName"] == userName) 
                 {
                   userList[i]["isConnected"] = false
                   break;
@@ -79,19 +82,19 @@ io.on('connection', (socket) =>
               console.log("Online users after disconnect:"); 
               for (var i=0; i<userList.length; i++) 
               {
-                console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+                console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
               }
-            		
+                
                 io.emit("userList", userList);
               socket.broadcast.emit( "userdisconnect" ,' user has left')
             });
 })
 
-socket.on("exitUser", function(userNickname) // when user logs out of account in the app we remove them from the list
+socket.on("exitUser", function(userName) // when user logs out of account in the app we remove them from the list
               {
                 for (var i=0; i<userList.length; i++) 
                 {
-                  if (userList[i]["nickname"] == userNickname)
+                  if (userList[i]["userName"] == userName)
                   {
                     userList.splice(i, 1); //removes user from userList
                     break;
@@ -103,7 +106,7 @@ socket.on("exitUser", function(userNickname) // when user logs out of account in
                 console.log("Online users after log out/user exits:"); 
                 for (var i=0; i<userList.length; i++) 
                 {
-                  console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+                  console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
                 }
             }); 
 
@@ -122,41 +125,41 @@ socket.on('messagedetection', (senderNickname,messageContent) =>
       
 socket.on('newUser', (newUserName, newPassword) => 
 {
-		var newObject = {}; 		
-		newObject['userName'] = newUserName;
-		newObject['passWord'] = newPassword;
-		console.log("new user : " + newUserName+ ", password : " + newPassword); 
-		var json = JSON.stringify(newObject); 
-		var fs = require('fs');
-// 		fs.writeFile('myjsonfile.json', json, 'utf8', callback);
-		fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
+    // var newObject = {};     
+    userInfo['userName'] = newUserName;
+    userInfo['passWord'] = newPassword;
+    console.log("new user : " + newUserName+ ", password : " + newPassword); 
+    var json = JSON.stringify(userInfo); 
+    var fs = require('fs');
+//    fs.writeFile('myjsonfile.json', json, 'utf8', callback);
+    fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
     {
-    		if (err)
+        if (err)
         {
-    			console.log(err);
-    		} 
-    		else 
+          console.log(err);
+        } 
+        else 
         {
-    			usersDataBase = JSON.parse(data);
-    			
-    			usersDataBase.users.push(newObject);
-    			
-    			json = JSON.stringify(usersDataBase); 
-    			
-    			fs.writeFile('usersDataBase.json', json, 'utf8',function (err) 
-    			{
-    		   		if (err) 
+          usersDataBase = JSON.parse(data);
+          
+          usersDataBase.users.push(userInfo);
+          
+          json = JSON.stringify(usersDataBase); 
+          
+          fs.writeFile('usersDataBase.json', json, 'utf8',function (err) 
+          {
+              if (err) 
               {
-    				    return console.log(err);
-    		    	}
-    				  else 
+                return console.log(err);
+              }
+              else 
               {
-    		    		console.log("The file was saved!"); // write it back 
-    					}
-		      })
+                console.log("The file was saved!"); // write it back 
+              }
+          })
         }
       })
-	})
+  })
 
   sendTo(socket, userList);
 })
