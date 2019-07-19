@@ -142,7 +142,7 @@ socket.on('newUser', (newUserName, newPassword) =>
         {
           usersDataBase = JSON.parse(data);
           
-          usersDataBase.users.push(userInfo);
+          usersDataBase.userList.push(userInfo);
           
           json = JSON.stringify(usersDataBase); 
           
