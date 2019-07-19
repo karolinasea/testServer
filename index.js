@@ -51,10 +51,12 @@ io.on('connection', (socket) =>
             io.emit("userConnectUpdate", userInfo)
                 
             //afficher list des user sur la console
+            console.log("Online users after join:"); 
             for (var i=0; i<userList.length; i++) 
             {
               console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
             }
+               
                 
             socket.on('disconnect', function() 
             {
@@ -67,13 +69,38 @@ io.on('connection', (socket) =>
                   break;
                 }
               }
-          		
-            io.emit("userList", userList);
-            
-            socket.broadcast.emit( "userdisconnect" ,' user has left')
-      });   
+
+                //afficher list des user sur la console
+              console.log("Online users after disconnect:"); 
+              for (var i=0; i<userList.length; i++) 
+              {
+                console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+              }
+            		
+                io.emit("userList", userList);
+              socket.broadcast.emit( "userdisconnect" ,' user has left')
+            });
 })
 
+socket.on("exitUser", function(userNickname) // when user logs out of account in the app we remove them from the list
+              {
+                for (var i=0; i<userList.length; i++) 
+                {
+                  if (userList[i]["nickname"] == userNickname)
+                  {
+                    userList.splice(i, 1); //removes user from userList
+                    break;
+                  }
+                }
+                io.emit("userList", userList);
+
+                //afficher list des user sur la console
+                console.log("Online users after log out/user exits:"); 
+                for (var i=0; i<userList.length; i++) 
+                {
+                  console.log(userList[i]["nickname"] + " " + userList[i]["isConnected"]);
+                }
+            }); 
 
 socket.on('messagedetection', (senderNickname,messageContent) => 
 {
