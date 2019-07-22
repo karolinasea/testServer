@@ -33,8 +33,10 @@ io.on('connection', (socket) =>
       var fs = require('fs');
       io.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
 
-      // var arr = JSON.parse(fs.readFileSync("usersDataBase.json", "utf8"));
-      // io.emit("testList", arr); //prints the json on xcode console
+      var arr = JSON.parse(fs.readFileSync("usersDataBase.json", "utf8"));
+      io.emit("DBList", arr); //prints the json on xcode console
+
+      // io.emit('DBUserList', {usersDataBase})
 
       socket.on('join', function(userName) 
       {
