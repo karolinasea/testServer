@@ -29,14 +29,8 @@ io.on('connection', (socket) =>
 
       console.log('user connected')
 
-
       var fs = require('fs');
       io.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
-
-      var arr = JSON.parse(fs.readFileSync("usersDataBase.json", "utf8"));
-      io.emit("DBList", arr); //prints the json on xcode console
-
-      // io.emit('DBUserList', {usersDataBase})
 
       socket.on('join', function(userName) 
       {
@@ -74,6 +68,16 @@ io.on('connection', (socket) =>
               console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
             }
                
+
+            //function that sends a session description protocol and with which we can receive the sdp as well 
+            //it also prints the sdp in the server terminal
+            socket.on('sendSDP', function(sdp)
+            {
+            	console.log('SEND SDP')
+            	console.log('in the sendsdp function ' + sdp)
+            	socket.broadcast.emit("sdp", sdp)
+            	io.emit("sentSDP", sdp)
+            });
                 
             socket.on('disconnect', function() 
             {
