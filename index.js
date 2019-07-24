@@ -185,10 +185,10 @@ socket.on('newUser', (newUserName, newPassword) =>
 socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
 {
 //log the message in console 
-console.log(senderNickname+" : " +messageContent)
+console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
 
 //create a message object 
-let  message = {"messageContent":messageContent, "senderNickname":senderNickname}
+let  message = {"messageContent":messageContent, "senderNickname":senderNickname};
 
 // send the message to all users including the sender  using io.emit() 
 // 				var newObject = {}
@@ -201,13 +201,18 @@ let  message = {"messageContent":messageContent, "senderNickname":senderNickname
        {
 	if (userList[i]["userName"] == receiverNickname )
 	{
+	  console.log("Destination located");
 	  var newObject = {}; 		
 	  newObject['senderNickname'] = receiverNickname;
 	  newObject['messageContent'] = messageContent;
 	  var json = JSON.stringify(newObject); 
 
 	  (userList[i]["userName"]).emit('chatMessage' , message);
-// 	  io.in(userList[i]["userName"]).send(json);
+	  console.log("Sending message to "+ receiverNickname );
+		socket.send("TESTINGGGGG"); 
+		sendTo(socket, message); 
+	  
+	  io.in(userList[i]["userName"]).send(json);
 	}
        }
 
