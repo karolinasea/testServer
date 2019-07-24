@@ -207,10 +207,16 @@ let  message = {"messageContent":messageContent, "senderNickname":senderNickname
 	  newObject['messageContent'] = messageContent;
 	  var json = JSON.stringify(newObject); 
 
-	  (userList[i]["userName"]).emit('chatMessage' , message);
+// 	  (userList[i]["userName"]).emit('chatMessage' , message);
 	  console.log("Sending message to "+ receiverNickname );
+	  console.log("Socket :  "+ socket );
 		socket.send("TESTINGGGGG"); 
 		sendTo(socket, message); 
+
+	       sendTo(connection, { 
+		  receiverNickname: receiverNickname, 
+		  messageContent: messageContent 
+	       }); 
 	  
 	  io.in(userList[i]["userName"]).send(json);
 	}
