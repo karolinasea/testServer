@@ -73,12 +73,44 @@ io.on('connection', (socket) =>
             //it also prints the sdp in the server terminal
             socket.on('sendSDP', function(sdp)
             {
-            	console.log('SEND SDP')
-            	console.log('in the sendsdp function ' + sdp)
-            	socket.broadcast.emit("sdp", sdp)
-            	io.emit("sentSDP", sdp)
+            	console.log('SEND SDP');
+            	console.log('in the sendsdp function ' + sdp);
+            	socket.broadcast.emit("sentSDP", sdp);
+            	io.emit("sentSDP", sdp);
             });
-                
+
+            socket.on('sendICECandidates', function(ice)
+            {
+            	console.log('SEND ICE');
+            	console.log('in the sendICECandidates function ' + ICE);
+            	socket.broadcast.emit("sentICE", ice);
+            	io.emit("sentICE", ice);
+            });
+
+			// socket.on('sendSDPtoContact', (sdp, userName, dest) =>
+   //          {
+   //          	console.log('SEND SDP to ' + dest + ' from: ' + userName)
+   //          	// console.log('in the sendsdp function ' + sdp)
+   //          	socket.broadcast.emit("sdp", sdp)
+   //          	io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
+   //          })
+
+           socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
+			{
+		       //log the message in console 
+		       console.log(senderNickname+" : " +messageContent)
+
+		      //create a message object 
+		      let  message = {"message":messageContent, "senderNickname":senderNickname}
+
+		       // send the message to all users including the sender  using io.emit() 
+				var newObject = {}
+				newObject['senderNickname'] = receiverNickname; 
+				newObject['messageContent'] = messageContent; 
+				var json = JSON.stringify(newObject); 
+		      io.in(receiverNickname).emit("chatMessage", json );
+
+})
             socket.on('disconnect', function() 
             {
               console.log(userName +' has left ')
@@ -123,18 +155,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
                 }
 }); 
 
-socket.on('messagedetection', (senderNickname,messageContent) => 
-{
-       //log the message in console 
-       console.log(senderNickname+" : " +messageContent)
 
-      //create a message object 
-      let  message = {"message":messageContent, "senderNickname":senderNickname}
-
-       // send the message to all users including the sender  using io.emit() 
-      io.emit('message', message )
-
-})
       
 socket.on('newUser', (newUserName, newPassword) => 
 {
