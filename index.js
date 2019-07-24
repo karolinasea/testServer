@@ -197,7 +197,7 @@ let  message = {"message":messageContent, "senderNickname":senderNickname}
 // 				var json = JSON.stringify(newObject); 
 // 		      io.in(receiverNickname).emit("chatMessage", json );		      
 
-  for (var i = 0; i<userList.length; i++0)
+  for (var i = 0; i<userList.length; i++)
        {
 	if (userList[i]["userName"] == receiverNickname )
 	{
