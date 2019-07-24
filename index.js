@@ -95,22 +95,7 @@ io.on('connection', (socket) =>
    //          	io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
    //          })
 
-           socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
-			{
-		       //log the message in console 
-		       console.log(senderNickname+" : " +messageContent)
 
-		      //create a message object 
-		      let  message = {"message":messageContent, "senderNickname":senderNickname}
-
-		       // send the message to all users including the sender  using io.emit() 
-				var newObject = {}
-				newObject['senderNickname'] = receiverNickname; 
-				newObject['messageContent'] = messageContent; 
-				var json = JSON.stringify(newObject); 
-		      io.in(receiverNickname).emit("chatMessage", json );
-
-})
             socket.on('disconnect', function() 
             {
               console.log(userName +' has left ')
@@ -197,8 +182,36 @@ socket.on('newUser', (newUserName, newPassword) =>
     userList.push(userInfo); //put the new user in the list 
   })
 
+socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
+{
+//log the message in console 
+console.log(senderNickname+" : " +messageContent)
 
-  sendTo(socket, userList);
+//create a message object 
+let  message = {"message":messageContent, "senderNickname":senderNickname}
+
+// send the message to all users including the sender  using io.emit() 
+// 				var newObject = {}
+// 				newObject['senderNickname'] = receiverNickname; 
+// 				newObject['messageContent'] = messageContent; 
+// 				var json = JSON.stringify(newObject); 
+// 		      io.in(receiverNickname).emit("chatMessage", json );		      
+
+  for (var i = 0; i<userList.length; i++0)
+       {
+	if (userList[i]["userName"] == receiverNickname )
+	{
+	  var newObject = {}; 		
+	  newObject['senderNickname'] = receiverNickname;
+	  newObject['messageContent'] = messageContent;
+	  var json = JSON.stringify(newObject); 
+
+	  io.in(userList[i]["userName"]).emit('chatMessage' , json);
+	}
+       }
+
+
+})
 })
 
 
