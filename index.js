@@ -206,7 +206,8 @@ let  message = {"message":messageContent, "senderNickname":senderNickname}
 	  newObject['messageContent'] = messageContent;
 	  var json = JSON.stringify(newObject); 
 
-	  io.in(userList[i]["userName"]).emit('chatMessage' , json);
+	  (userList[i]["userName"]).emit('chatMessage' , json);
+// 	  io.in(userList[i]["userName"]).send(json);
 	}
        }
 
