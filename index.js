@@ -188,7 +188,7 @@ socket.on('messagedetection', (senderNickname, receiverNickname, messageContent)
 console.log(senderNickname+" : " +messageContent)
 
 //create a message object 
-let  message = {"message":messageContent, "senderNickname":senderNickname}
+let  message = {"messageContent":messageContent, "senderNickname":senderNickname}
 
 // send the message to all users including the sender  using io.emit() 
 // 				var newObject = {}
@@ -206,7 +206,7 @@ let  message = {"message":messageContent, "senderNickname":senderNickname}
 	  newObject['messageContent'] = messageContent;
 	  var json = JSON.stringify(newObject); 
 
-	  (userList[i]["userName"]).emit('chatMessage' , json);
+	  (userList[i]["userName"]).emit('chatMessage' , message);
 // 	  io.in(userList[i]["userName"]).send(json);
 	}
        }
