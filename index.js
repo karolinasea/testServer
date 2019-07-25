@@ -82,7 +82,7 @@ io.on('connection', (socket) =>
             socket.on('sendICECandidates', function(ice)
             {
             	console.log('SEND ICE');
-            	console.log('in the sendICECandidates function ' + ICE);
+            	console.log('in the sendICECandidates function ' + ice);
             	socket.broadcast.emit("sentICE", ice);
             	io.emit("sentICE", ice);
             });
