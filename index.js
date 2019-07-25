@@ -141,7 +141,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
 }); 
 
 
-      
+//when we create a new account in the app it registers it into a JSON file stored in the server folder     
 socket.on('newUser', (newUserName, newPassword) => 
 {
     var userInfo = {};     
