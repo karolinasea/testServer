@@ -69,32 +69,6 @@ io.on('connection', (socket) =>
             }
                
 
-            //function that sends a session description protocol and with which we can receive the sdp as well 
-            //it also prints the sdp in the server terminal
-            socket.on('sendSDP', function(sdp)
-            {
-            	console.log('SEND SDP');
-            	console.log('in the sendsdp function ' + sdp);
-            	socket.broadcast.emit("sentSDP", sdp);
-            	io.emit("sentSDP", sdp);
-            });
-
-            socket.on('sendICECandidates', function(ice)
-            {
-            	console.log('SEND ICE');
-            	console.log('in the sendICECandidates function ' + ICE);
-            	socket.broadcast.emit("sentICE", ice);
-            	io.emit("sentICE", ice);
-            });
-
-			// socket.on('sendSDPtoContact', (sdp, userName, dest) =>
-   //          {
-   //          	console.log('SEND SDP to ' + dest + ' from: ' + userName)
-   //          	// console.log('in the sendsdp function ' + sdp)
-   //          	socket.broadcast.emit("sdp", sdp)
-   //          	io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
-   //          })
-
 
             socket.on('disconnect', function() 
             {
@@ -181,7 +155,7 @@ socket.on('newUser', (newUserName, newPassword) =>
       })
     userList.push(userInfo); //put the new user in the list 
   })
-
+/*
 	socket.on('sendRequest', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " wants connection with "+ receiverNickname);
 
@@ -203,6 +177,36 @@ socket.on('newUser', (newUserName, newPassword) =>
 		
 		io.emit('connectionAccepted', newObject); 
 	});	
+	*/
+	//function that sends a session description protocol and with which we can receive the sdp as well 
+	//it also prints the sdp in the server terminal
+	//CORRESPONDS TO THE OFFER
+	socket.on('sendSDP', function(sdp)
+	{
+		console.log('SENDING SDP');
+		
+		var newObject = {}; 		
+		newObject['senderNickname'] = senderNickname;
+		newObject['receiverNickname'] = receiverNickname;
+		newObject['SDP'] = sdp; 
+		//console.log('in the sendsdp function ' + sdp);
+		//socket.broadcast.emit("sentSDP", sdp);
+		io.emit("sentSDP", newObject);
+	});
+	//IP address where the correspondant can be found
+	socket.on('sendICECandidates', function(ice)
+	{
+		console.log('SENDING ICE');
+		
+		var newObject = {}; 		
+		newObject['senderNickname'] = senderNickname;
+		newObject['receiverNickname'] = receiverNickname;
+		newObject['ICE'] = ice; 
+		//console.log('in the sendICECandidates function ' + ice);
+		//socket.broadcast.emit("sentICE", ice);
+		io.emit("sentICE", newObject);
+	});
+	//offer refused
 	socket.on('refuse', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " refused connection with "+ receiverNickname);
 
@@ -213,16 +217,15 @@ socket.on('newUser', (newUserName, newPassword) =>
 		
 		io.emit('connectionRefused', newObject); 
 	}); 	
-	socket.on('offer', (senderNickname, receiverNickname) => {
-		console.log(senderNickname + " is sending offer to "+ receiverNickname);
 
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		//var json = JSON.stringify(newObject);		
-		
-		io.emit('offer', newObject); 
-	});
+	// socket.on('sendSDPtoContact', (sdp, userName, dest) =>
+//          {
+//          	console.log('SEND SDP to ' + dest + ' from: ' + userName)
+//          	// console.log('in the sendsdp function ' + sdp)
+//          	socket.broadcast.emit("sdp", sdp)
+//          	io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
+//          })
+
 	
 socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
 {
