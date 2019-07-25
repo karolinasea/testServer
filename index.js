@@ -82,7 +82,7 @@ io.on('connection', (socket) =>
             socket.on('sendICECandidates', function(ice)
             {
             	console.log('SEND ICE');
-            	console.log('in the sendICECandidates function ' + ice);
+            	console.log('in the sendICECandidates function ' + ICE);
             	socket.broadcast.emit("sentICE", ice);
             	io.emit("sentICE", ice);
             });
@@ -141,7 +141,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
 }); 
 
 
-//when we create a new account in the app it registers it into a JSON file stored in the server folder     
+      
 socket.on('newUser', (newUserName, newPassword) => 
 {
     var userInfo = {};     
@@ -182,6 +182,16 @@ socket.on('newUser', (newUserName, newPassword) =>
     userList.push(userInfo); //put the new user in the list 
   })
 
+	socket.on('send', (senderNickname, receiverNickname) => {
+		console.log(senderNickname + " wants connection with "+ receiverNickname);
+
+		var newObject = {}; 		
+		newObject['senderNickname'] = senderNickname;
+		newObject['receiverNickname'] = receiverNickname;
+		var json = JSON.stringify(newObject);		
+		
+		io.emit('connectionRequest', json); 
+	}
 socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
 {
 //log the message in console 
@@ -189,13 +199,6 @@ console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
 
 //create a message object 
 let  message = {"messageContent":messageContent, "senderNickname":senderNickname};
-
-// send the message to all users including the sender  using io.emit() 
-// 				var newObject = {}
-// 				newObject['senderNickname'] = receiverNickname; 
-// 				newObject['messageContent'] = messageContent; 
-// 				var json = JSON.stringify(newObject); 
-// 		      io.in(receiverNickname).emit("chatMessage", json );		      
 
   for (var i = 0; i<userList.length; i++)
        {
@@ -212,11 +215,6 @@ let  message = {"messageContent":messageContent, "senderNickname":senderNickname
 	  console.log("Socket :  "+ socket );
 		socket.send("TESTINGGGGG"); 
 		sendTo(socket, message); 
-
-	       sendTo(connection, { 
-		  receiverNickname: receiverNickname, 
-		  messageContent: messageContent 
-	       }); 
 	  
 	  io.in(userList[i]["userName"]).send(json);
 	}
@@ -272,6 +270,7 @@ io.sockets.on('connection' , function(client){
 		io.sockets.in(data.id).emit('users_from_server', users);
 	});
 	
+
 	client.on('send', function(data){
 		console.log('Make connect to ' + data.id);
 		io.sockets.in(data.id).emit('wantconnect' , data);
