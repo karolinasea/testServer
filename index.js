@@ -181,7 +181,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 	//function that sends a session description protocol and with which we can receive the sdp as well 
 	//it also prints the sdp in the server terminal
 	//CORRESPONDS TO THE OFFER
-	socket.on('sendSDP', function(sdp)
+	socket.on('sendSDP', (senderNickname, receiverNickname, sdp ) =>
 	{
 		console.log('SENDING SDP');
 		
@@ -194,7 +194,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		io.emit("sentSDP", newObject);
 	});
 	//IP address where the correspondant can be found
-	socket.on('sendICECandidates', function(ice)
+	socket.on('sendICECandidates', (senderNickname, receiverNickname, ice ) =>
 	{
 		console.log('SENDING ICE');
 		
