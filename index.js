@@ -188,9 +188,9 @@ socket.on('newUser', (newUserName, newPassword) =>
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
-		var json = JSON.stringify(newObject);		
+		//var json = JSON.stringify(newObject);		
 		
-		io.emit('connectionRequest', json); 
+		io.emit('connectionRequest', newObject); 
 	}); 
 	
 	socket.on('accept', (senderNickname, receiverNickname) => {
@@ -199,9 +199,9 @@ socket.on('newUser', (newUserName, newPassword) =>
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
-		var json = JSON.stringify(newObject);		
+		//var json = JSON.stringify(newObject);		
 		
-		io.emit('connectionAccepted', json); 
+		io.emit('connectionAccepted', newObject); 
 	});	
 	socket.on('refuse', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " refused connection with "+ receiverNickname);
@@ -209,9 +209,9 @@ socket.on('newUser', (newUserName, newPassword) =>
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
-		var json = JSON.stringify(newObject);		
+		//var json = JSON.stringify(newObject);		
 		
-		io.emit('connectionRefused', json); 
+		io.emit('connectionRefused', newObject); 
 	}); 	
 	socket.on('offer', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " is sending offer to "+ receiverNickname);
@@ -219,9 +219,9 @@ socket.on('newUser', (newUserName, newPassword) =>
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
-		var json = JSON.stringify(newObject);		
+		//var json = JSON.stringify(newObject);		
 		
-		io.emit('offer', json); 
+		io.emit('offer', newObject); 
 	});
 	
 socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
