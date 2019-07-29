@@ -181,22 +181,37 @@ socket.on('newUser', (newUserName, newPassword) =>
 	//function that sends a session description protocol and with which we can receive the sdp as well 
 	//it also prints the sdp in the server terminal
 	//CORRESPONDS TO THE OFFER
-	socket.on('sendSDP', (senderNickname, receiverNickname, sdp ) =>
+	socket.on('sendSDP', (senderNickname, receiverNickname, type, sdp ) =>
 	{
-		console.log('SENDING SDP');
+		console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' type: ' + type + ' ' + sdp);
 		
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
+		newObject['type'] = type;
 		newObject['SDP'] = sdp; 
+		console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
 		//console.log('in the sendsdp function ' + sdp);
 		//socket.broadcast.emit("sentSDP", sdp);
 		io.emit("sentSDP", newObject);
 	});
+	// socket.on('sendSDP', (senderNickname, receiverNickname, sdp ) =>
+	// {
+	// 	console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' sdp ' + sdp);
+		
+	// 	var newObject = {}; 		
+	// 	newObject['senderNickname'] = senderNickname;
+	// 	newObject['receiverNickname'] = receiverNickname;
+	// 	newObject['SDP'] = sdp; 
+	// 	// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
+	// 	//console.log('in the sendsdp function ' + sdp);
+	// 	//socket.broadcast.emit("sentSDP", sdp);
+	// 	io.emit("sentSDP", newObject);
+	// });
 	//IP address where the correspondant can be found
 	socket.on('sendICECandidates', (senderNickname, receiverNickname, ice ) =>
 	{
-		console.log('SENDING ICE');
+		console.log('SENDING ICE from ' + senderNickname + ' to ' + receiverNickname + ' ' + ice);
 		
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
@@ -204,7 +219,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		newObject['ICE'] = ice; 
 		//console.log('in the sendICECandidates function ' + ice);
 		//socket.broadcast.emit("sentICE", ice);
-		io.emit("sentICE", newObject);
+		io.emit("icecandidate", newObject);
 	});
 	//offer refused
 	socket.on('refuse', (senderNickname, receiverNickname) => {
@@ -271,70 +286,70 @@ function sendTo(connection, message)
 }
 
 
-var users = [];
+// var users = [];
 
-app.get("/", function(req, res){
-    	res.send('Hello from 5000');	
-});
+// app.get("/", function(req, res){
+//     	res.send('Hello from 5000');	
+// });
 	
-io.sockets.on('connection' , function(client){
+// io.sockets.on('connection' , function(client){
 
-	client.on('join' , function(data){
-		if(users.includes(data.id)){
-			io.sockets.in(data.id).emit('join_faied');
-			console.log('User ' + data.id + ' existed');
-		} else {
-			users.push(data.id);
-			client.join(data.id);
-			io.sockets.in(data.id).emit('join_success');
-			console.log('User ' + data.id + ' has connected');
+// 	client.on('join' , function(data){
+// 		if(users.includes(data.id)){
+// 			io.sockets.in(data.id).emit('join_faied');
+// 			console.log('User ' + data.id + ' existed');
+// 		} else {
+// 			users.push(data.id);
+// 			client.join(data.id);
+// 			io.sockets.in(data.id).emit('join_success');
+// 			console.log('User ' + data.id + ' has connected');
 
-			client.broadcast.emit('new_user_join' , users);
-		}
-	});
+// 			client.broadcast.emit('new_user_join' , users);
+// 		}
+// 	});
 
-	client.on('leave', function(data){
-		console.log('User ' + data.id + ' has left');
-		client.leave(data.id);
-		users.pop(data.id);
-		client.broadcast.emit('user_has_left' , users);
-	});
+// 	client.on('leave', function(data){
+// 		console.log('User ' + data.id + ' has left');
+// 		client.leave(data.id);
+// 		users.pop(data.id);
+// 		client.broadcast.emit('user_has_left' , users);
+// 	});
 
-	client.on('get_users', function(data){
-		console.log('Get list user from ' + data.id);
-		io.sockets.in(data.id).emit('users_from_server', users);
-	});
+// 	client.on('get_users', function(data){
+// 		console.log('Get list user from ' + data.id);
+// 		io.sockets.in(data.id).emit('users_from_server', users);
+// 	});
 	
 
-	client.on('send', function(data){
-		console.log('Make connect to ' + data.id);
-		io.sockets.in(data.id).emit('wantconnect' , data);
-	});
+// 	client.on('send', function(data){
+// 		console.log('Make connect to ' + data.id);
+// 		io.sockets.in(data.id).emit('wantconnect' , data);
+// 	});
 	
-	client.on('acceptconnect' , function(data){
-		console.log('createoffer ' + data.id);
-		client.broadcast.emit('createoffer' , {});	
+// 	client.on('acceptconnect' , function(data){
+// 		console.log('createoffer ' + data.id);
+// 		client.broadcast.emit('createoffer' , {});	
 		
-	});
+// 	});
 	
-	client.on('unacceptconnect' , function(data){
-		client.broadcast.emit('unacceptconnect' , {});	
-	});
+// 	client.on('unacceptconnect' , function(data){
+// 		client.broadcast.emit('unacceptconnect' , {});	
+// 	});
 
-	client.on('offer', function (details) {
-		client.broadcast.emit('offer', details);
-		console.log('offer: ' + JSON.stringify(details));
-	});
+// 	client.on('offer', function (details) {
+// 		client.broadcast.emit('offer', details);
+// 		console.log('offer: ' + JSON.stringify(details));
+// 	});
 
-	client.on('answer', function (details) {
-		client.broadcast.emit('answer', details);
-		console.log('answer: ' + JSON.stringify(details));
-	});
+// 	client.on('answer', function (details) {
+// 		client.broadcast.emit('answer', details);
+// 		console.log('answer: ' + JSON.stringify(details));
+// 	});
 		
-	client.on('candidate', function (details) {
-		client.broadcast.emit('candidate', details);
-		console.log('candidate: ' + JSON.stringify(details));
-	});
-});
+// 	client.on('candidate', function (details) {
+// 		client.broadcast.emit('candidate', details);
+// 		console.log('candidate: ' + JSON.stringify(details));
+// 	});
+// });
 
 
