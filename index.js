@@ -158,7 +158,6 @@ socket.on('newUser', (newUserName, newPassword) =>
 /*
 	socket.on('sendRequest', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " wants connection with "+ receiverNickname);
-
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
@@ -169,7 +168,6 @@ socket.on('newUser', (newUserName, newPassword) =>
 	
 	socket.on('accept', (senderNickname, receiverNickname) => {
 		console.log(senderNickname + " accepted connection with "+ receiverNickname);
-
 		var newObject = {}; 		
 		newObject['senderNickname'] = senderNickname;
 		newObject['receiverNickname'] = receiverNickname;
@@ -242,34 +240,18 @@ socket.on('newUser', (newUserName, newPassword) =>
 //          })
 
 	
-socket.on('messagedetection', (senderNickname, receiverNickname, messageContent) => 
+socket.on('chatMessageDetection', (senderNickname, receiverNickname, messageContent) => 
 {
+	
 //log the message in console 
-console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
-
-//create a message object 
-let  message = {"messageContent":messageContent, "senderNickname":senderNickname};
-
-  for (var i = 0; i<userList.length; i++)
-       {
-	if (userList[i]["userName"] == receiverNickname )
-	{
-	  console.log("Destination located");
+	console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
 	  var newObject = {}; 		
 	  newObject['senderNickname'] = receiverNickname;
+	  newObject['receiverNickname'] = receiverNickname;
 	  newObject['messageContent'] = messageContent;
-	  var json = JSON.stringify(newObject); 
 
-// 	  (userList[i]["userName"]).emit('chatMessage' , message);
+     io.emit('chatMessage' , newObject);
 	  console.log("Sending message to "+ receiverNickname );
-	  console.log("Socket :  "+ socket );
-		socket.send("TESTINGGGGG"); 
-		sendTo(socket, message); 
-	  
-	  io.in(userList[i]["userName"]).send(json);
-	}
-       }
-
 
 })
 })
@@ -351,5 +333,4 @@ function sendTo(connection, message)
 // 		console.log('candidate: ' + JSON.stringify(details));
 // 	});
 // });
-
 
