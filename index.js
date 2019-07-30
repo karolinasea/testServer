@@ -34,8 +34,8 @@ io.on('connection', (socket) =>
 
       socket.on('join', function(userName) 
       {
-            console.log(userName +" : has joined the chat "  );
-            socket.broadcast.emit('userjoinedthechat',userName +" : has joined the chat ");
+            console.log(userName +" : is online "  );
+            socket.broadcast.emit('userjoinedthechat',userName +" is online ");
                   
             var userInfo = {};
             var foundUser = false;
@@ -106,7 +106,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
                 }
                 io.emit("userList", userList);
 
-                //afficher list des user sur la console
+                //affiche list des users sur la console
                 console.log("Online users after log out/user exits:"); 
                 for (var i=0; i<userList.length; i++) 
                 {
@@ -115,7 +115,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
 }); 
 
 
-      
+//add user info (username password) to database in JSON format 
 socket.on('newUser', (newUserName, newPassword) => 
 {
     var userInfo = {};     
@@ -190,7 +190,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		newObject['receiverNickname'] = receiverNickname;
 		newObject['type'] = type;
 		newObject['SDP'] = sdp; 
-		console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
+		// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
 		//console.log('in the sendsdp function ' + sdp);
 		//socket.broadcast.emit("sentSDP", sdp);
 		io.emit("sentSDP", newObject);
