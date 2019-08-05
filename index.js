@@ -189,7 +189,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		newObject['type'] = type;
 		newObject['SDP'] = sdp; 
 		// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
-		//console.log('in the sendsdp function ' + sdp);
+		console.log('in the sendsdp function ' + JSON.stringify(sdp));
 		//socket.broadcast.emit("sentSDP", sdp);
 		io.emit("sentSDP", newObject);
 	});
@@ -333,4 +333,3 @@ function sendTo(connection, message)
 // 		console.log('candidate: ' + JSON.stringify(details));
 // 	});
 // });
-
