@@ -189,7 +189,7 @@ socket.on('newUser', (newUserName, newPassword) =>
 		newObject['type'] = type;
 		newObject['SDP'] = sdp; 
 		// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
-		console.log('in the sendsdp function ' + JSON.stringify(sdp));
+		console.log('in the sendsdp function ' + sdp);
 		//socket.broadcast.emit("sentSDP", sdp);
 		io.emit("sentSDP", newObject);
 	});
@@ -229,7 +229,20 @@ socket.on('newUser', (newUserName, newPassword) =>
 		//var json = JSON.stringify(newObject);		
 		
 		io.emit('connectionRefused', newObject); 
-	}); 	
+	}); 
+	//offer ios - android
+	socket.on('requestOffer', (senderNickname, receiverNickname, os) => {
+		console.log("request offer from" +senderNickname + " to "+ receiverNickname + " , os = " +os);
+
+		var newObject = {}; 		
+		newObject['senderNickname'] = senderNickname;
+		newObject['receiverNickname'] = receiverNickname;
+		newObject['os'] = os;
+		//var json = JSON.stringify(newObject);		
+		
+		io.emit('sendMeAnOfferPlease', newObject); 
+	}); 
+	
 
 	// socket.on('sendSDPtoContact', (sdp, userName, dest) =>
 //          {
@@ -333,3 +346,4 @@ function sendTo(connection, message)
 // 		console.log('candidate: ' + JSON.stringify(details));
 // 	});
 // });
+
