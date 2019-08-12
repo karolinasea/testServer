@@ -29,6 +29,9 @@ io.on('connection', (socket) =>
 
       console.log('user connected')
 
+      //those two lines send the list of the JSON db for us to check username and passwords
+      // we should not put this function in connection function
+      //we should make a function that sends this list to get it only if we need it and call it database list to avoid being confused
       var fs = require('fs');
       io.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
 
@@ -68,8 +71,6 @@ io.on('connection', (socket) =>
               console.log(userList[i]["userName"] + " " + userList[i]["isConnected"]);
             }
                
-
-
             socket.on('disconnect', function() 
             {
               console.log(userName +' has left ')
@@ -156,115 +157,156 @@ socket.on('newUser', (newUserName, newPassword) =>
     userList.push(userInfo); //put the new user in the list 
   })
 /*
-	socket.on('sendRequest', (senderNickname, receiverNickname) => {
-		console.log(senderNickname + " wants connection with "+ receiverNickname);
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		//var json = JSON.stringify(newObject);		
-		
-		io.emit('connectionRequest', newObject); 
-	}); 
-	
-	socket.on('accept', (senderNickname, receiverNickname) => {
-		console.log(senderNickname + " accepted connection with "+ receiverNickname);
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		//var json = JSON.stringify(newObject);		
-		
-		io.emit('connectionAccepted', newObject); 
-	});	
-	*/
-	//function that sends a session description protocol and with which we can receive the sdp as well 
-	//it also prints the sdp in the server terminal
-	//CORRESPONDS TO THE OFFER
-	socket.on('sendSDP', (senderNickname, receiverNickname, type, sdp ) =>
-	{
-		console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' type: ' + type + ' ' + sdp);
-		
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		newObject['type'] = type;
-		newObject['SDP'] = sdp; 
-		// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
-		console.log('in the sendsdp function ' + sdp);
-		//socket.broadcast.emit("sentSDP", sdp);
-		io.emit("sentSDP", newObject);
-	});
-	// socket.on('sendSDP', (senderNickname, receiverNickname, sdp ) =>
-	// {
-	// 	console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' sdp ' + sdp);
-		
-	// 	var newObject = {}; 		
-	// 	newObject['senderNickname'] = senderNickname;
-	// 	newObject['receiverNickname'] = receiverNickname;
-	// 	newObject['SDP'] = sdp; 
-	// 	// console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
-	// 	//console.log('in the sendsdp function ' + sdp);
-	// 	//socket.broadcast.emit("sentSDP", sdp);
-	// 	io.emit("sentSDP", newObject);
-	// });
-	//IP address where the correspondant can be found
-	socket.on('sendICECandidates', (senderNickname, receiverNickname, ice ) =>
-	{
-		console.log('SENDING ICE from ' + senderNickname + ' to ' + receiverNickname + ' ' + ice);
-		
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		newObject['ICE'] = ice; 
-		//console.log('in the sendICECandidates function ' + ice);
-		//socket.broadcast.emit("sentICE", ice);
-		io.emit("icecandidate", newObject);
-	});
-	//offer refused
-	socket.on('refuse', (senderNickname, receiverNickname) => {
-		console.log(senderNickname + " refused connection with "+ receiverNickname);
+  socket.on('sendRequest', (senderNickname, receiverNickname) => {
+    console.log(senderNickname + " wants connection with "+ receiverNickname);
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    //var json = JSON.stringify(newObject);   
+    
+    io.emit('connectionRequest', newObject); 
+  }); 
+  
+  socket.on('accept', (senderNickname, receiverNickname) => {
+    console.log(senderNickname + " accepted connection with "+ receiverNickname);
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    //var json = JSON.stringify(newObject);   
+    
+    io.emit('connectionAccepted', newObject); 
+  }); 
+  */
+  //function that sends a session description protocol and with which we can receive the sdp as well 
+  //it also prints the sdp in the server terminal
+  //CORRESPONDS TO THE OFFER
 
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		//var json = JSON.stringify(newObject);		
-		
-		io.emit('connectionRefused', newObject); 
-	}); 
-	//offer ios - android
-	socket.on('requestOffer', (senderNickname, receiverNickname, os) => {
-		console.log("request offer from" +senderNickname + " to "+ receiverNickname + " , os = " +os);
+  socket.on('checkLogin', (username, password) =>
+  {
+      fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
+      {
+        var i=0;
+        var check;
+          if (err)
+          {
+            console.log(err);
+          } 
+          else 
+          {
+            usersDataBase = JSON.parse(data);
+            while (i<usersDataBase.users.length)
+            {
+              console.log(" usersDataBase.users[i] " + usersDataBase.users[i]["userName"] + " " + usersDataBase.users[i]["passWord"])
+               if (usersDataBase.users[i]["userName"] == username && usersDataBase.users[i]["passWord"] == password) 
+               {
+                  check = true
+                  io.emit("resultLogin", check)
+                  console.log("check login works check = " + check)
+                  break;
+               } 
+               else 
+               {
+                  i++;
+               }
+                if (i >= usersDataBase.users.length) 
+                {
+                  check = false
+                  io.emit("resultLogin", check)
+                  console.log("check login works check = " + check)
+                }
+            }
+            
+          }
+        })
+    })
 
-		var newObject = {}; 		
-		newObject['senderNickname'] = senderNickname;
-		newObject['receiverNickname'] = receiverNickname;
-		newObject['os'] = os;
-		//var json = JSON.stringify(newObject);		
-		
-		io.emit('sendMeAnOfferPlease', newObject); 
-	}); 
-	
+  socket.on('sendSDP', (senderNickname, receiverNickname, type, sdp ) =>
+  {
+    console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' type: ' + type + ' ' + sdp);
+    
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    newObject['type'] = type;
+    newObject['SDP'] = sdp; 
+    // console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
+    // console.log('in the sendsdp function ' + sdp);
+    //socket.broadcast.emit("sentSDP", sdp);
+    io.emit("sentSDP", newObject);
+  });
+  // socket.on('sendSDP', (senderNickname, receiverNickname, sdp ) =>
+  // {
+  //  console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' sdp ' + sdp);
+    
+  //  var newObject = {};     
+  //  newObject['senderNickname'] = senderNickname;
+  //  newObject['receiverNickname'] = receiverNickname;
+  //  newObject['SDP'] = sdp; 
+  //  // console.log('********************************************* sendNickname from new object ' + newObject['senderNickname']  + ' receiverNickname from new object ' + newObject['receiverNickname'] + ' type from new object ' + newObject['type'] + ' sdp from new object ' + newObject['SDP']);
+  //  //console.log('in the sendsdp function ' + sdp);
+  //  //socket.broadcast.emit("sentSDP", sdp);
+  //  io.emit("sentSDP", newObject);
+  // });
+  //IP address where the correspondant can be found
+  socket.on('sendICECandidates', (senderNickname, receiverNickname, ice ) =>
+  {
+    console.log('SENDING ICE from ' + senderNickname + ' to ' + receiverNickname + ' ' + ice);
+    
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    newObject['ICE'] = ice; 
+    //console.log('in the sendICECandidates function ' + ice);
+    //socket.broadcast.emit("sentICE", ice);
+    io.emit("icecandidate", newObject);
+  });
+  //offer refused
+  socket.on('refuse', (senderNickname, receiverNickname) => {
+    console.log(senderNickname + " refused connection with "+ receiverNickname);
 
-	// socket.on('sendSDPtoContact', (sdp, userName, dest) =>
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    //var json = JSON.stringify(newObject);   
+    
+    io.emit('connectionRefused', newObject); 
+  }); 
+  //offer ios - android
+  socket.on('requestOffer', (senderNickname, receiverNickname, os, type) => {
+    console.log("request offer from" +senderNickname + " to "+ receiverNickname + " , os = " +os);
+
+    var newObject = {};     
+    newObject['senderNickname'] = senderNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    newObject['os'] = os;
+    newObject['type'] = type;
+    //var json = JSON.stringify(newObject);   
+    
+    io.emit('sendMeAnOfferPlease', newObject); 
+  }); 
+  
+
+  // socket.on('sendSDPtoContact', (sdp, userName, dest) =>
 //          {
-//          	console.log('SEND SDP to ' + dest + ' from: ' + userName)
-//          	// console.log('in the sendsdp function ' + sdp)
-//          	socket.broadcast.emit("sdp", sdp)
-//          	io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
+//            console.log('SEND SDP to ' + dest + ' from: ' + userName)
+//            // console.log('in the sendsdp function ' + sdp)
+//            socket.broadcast.emit("sdp", sdp)
+//            io.emit("sentSDPtoClient", { data: sdp, from: userName, to: dest })
 //          })
 
-	
+  
 socket.on('chatMessageDetection', (senderNickname, receiverNickname, messageContent) => 
 {
-	
+  
 //log the message in console 
-	console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
-	  var newObject = {}; 		
-	  newObject['senderNickname'] = receiverNickname;
-	  newObject['receiverNickname'] = receiverNickname;
-	  newObject['messageContent'] = messageContent;
+  console.log(senderNickname+" to " + receiverNickname + " : " +messageContent);
+    var newObject = {};     
+    newObject['senderNickname'] = receiverNickname;
+    newObject['receiverNickname'] = receiverNickname;
+    newObject['messageContent'] = messageContent;
 
      io.emit('chatMessage' , newObject);
-	  console.log("Sending message to "+ receiverNickname );
+    console.log("Sending message to "+ receiverNickname );
 
 })
 })
@@ -279,71 +321,3 @@ function sendTo(connection, message)
 { 
    connection.send(JSON.stringify(message)); 
 }
-
-
-// var users = [];
-
-// app.get("/", function(req, res){
-//     	res.send('Hello from 5000');	
-// });
-	
-// io.sockets.on('connection' , function(client){
-
-// 	client.on('join' , function(data){
-// 		if(users.includes(data.id)){
-// 			io.sockets.in(data.id).emit('join_faied');
-// 			console.log('User ' + data.id + ' existed');
-// 		} else {
-// 			users.push(data.id);
-// 			client.join(data.id);
-// 			io.sockets.in(data.id).emit('join_success');
-// 			console.log('User ' + data.id + ' has connected');
-
-// 			client.broadcast.emit('new_user_join' , users);
-// 		}
-// 	});
-
-// 	client.on('leave', function(data){
-// 		console.log('User ' + data.id + ' has left');
-// 		client.leave(data.id);
-// 		users.pop(data.id);
-// 		client.broadcast.emit('user_has_left' , users);
-// 	});
-
-// 	client.on('get_users', function(data){
-// 		console.log('Get list user from ' + data.id);
-// 		io.sockets.in(data.id).emit('users_from_server', users);
-// 	});
-	
-
-// 	client.on('send', function(data){
-// 		console.log('Make connect to ' + data.id);
-// 		io.sockets.in(data.id).emit('wantconnect' , data);
-// 	});
-	
-// 	client.on('acceptconnect' , function(data){
-// 		console.log('createoffer ' + data.id);
-// 		client.broadcast.emit('createoffer' , {});	
-		
-// 	});
-	
-// 	client.on('unacceptconnect' , function(data){
-// 		client.broadcast.emit('unacceptconnect' , {});	
-// 	});
-
-// 	client.on('offer', function (details) {
-// 		client.broadcast.emit('offer', details);
-// 		console.log('offer: ' + JSON.stringify(details));
-// 	});
-
-// 	client.on('answer', function (details) {
-// 		client.broadcast.emit('answer', details);
-// 		console.log('answer: ' + JSON.stringify(details));
-// 	});
-		
-// 	client.on('candidate', function (details) {
-// 		client.broadcast.emit('candidate', details);
-// 		console.log('candidate: ' + JSON.stringify(details));
-// 	});
-// });
-
