@@ -199,10 +199,7 @@ socket.on('newUser', (newUserName, newPassword) =>
               console.log(" usersDataBase.users[i] " + usersDataBase.users[i]["userName"] + " " + usersDataBase.users[i]["passWord"])
                if (usersDataBase.users[i]["userName"] == username && usersDataBase.users[i]["passWord"] == password) 
                {
-                  check = true
-                  io.emit("resultLogin", check)
-                  console.log("check login works check = " + check)
-                  break;
+                  check = true     
                } 
                else 
                {
@@ -211,9 +208,13 @@ socket.on('newUser', (newUserName, newPassword) =>
                 if (i >= usersDataBase.users.length) 
                 {
                   check = false
-                  io.emit("resultLogin", check)
-                  console.log("check login works check = " + check)
                 }
+				
+				var loginObject = {};     
+				loginObject['username'] = username;
+				loginObject['check'] = check;
+                io.emit("resultLogin", loginObject)
+                console.log("check login for "+username+ " = " + check)
             }
             
           }
