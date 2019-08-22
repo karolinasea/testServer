@@ -209,10 +209,10 @@ socket.on('newUser', (newUserName, newPassword) =>
                 {
                   check = false
                 }
-				
-				var loginObject = {};     
-				loginObject['username'] = username;
-				loginObject['check'] = check;
+        
+        var loginObject = {};     
+        loginObject['username'] = username;
+        loginObject['check'] = check;
                 io.emit("resultLogin", loginObject)
                 console.log("check login for "+username+ " = " + check)
             }
@@ -220,6 +220,51 @@ socket.on('newUser', (newUserName, newPassword) =>
           }
         })
     })
+
+
+socket.on('checkUsername', function(username)
+{
+      fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
+      {
+        var i=0;
+        var check;
+          if (err)
+          {
+            console.log(err);
+          } 
+          else 
+          {
+            usersDataBase = JSON.parse(data);
+            while (i<usersDataBase.users.length)
+            {
+              // console.log(" usersDataBase.users[i] " + usersDataBase.users[i]["userName"])
+               if (usersDataBase.users[i]["userName"] == username) 
+               {
+                  check = true     // returns true is username already exists 
+                  var loginObject = {};     
+                  userNameObject['username'] = username;
+                  userNameObject['check'] = check;
+                  io.emit("resultUsername", userNameObject)
+                  console.log("check login for "+username+ " = " + check)
+                  break;
+               } 
+               else 
+               {
+                  i++;
+               }
+               if (i >= usersDataBase.users.length) 
+               {
+                  check = false
+                  var loginObject = {};     
+                  loginObject['username'] = username;
+                  loginObject['check'] = check;
+                  io.emit("resultLogin", loginObject)
+                  console.log("check username for "+username+ " = " + check)
+               }
+            }   
+          }
+      })
+  });
 
   socket.on('sendSDP', (senderNickname, receiverNickname, type, sdp ) =>
   {
