@@ -32,8 +32,10 @@ io.on('connection', (socket) =>
       //those two lines send the list of the JSON db for us to check username and passwords
       // we should not put this function in connection function
       //we should make a function that sends this list to get it only if we need it and call it database list to avoid being confused
-      var fs = require('fs');
-      io.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
+      
+      /*var fs = require('fs');
+    io.emit('testList', { text : fs.readFileSync("usersDataBase.json", "utf8") });
+    */
 
       socket.on('join', function(userName) 
       {
@@ -106,6 +108,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
                   }
                 }
                 io.emit("userList", userList);
+                io.emit("connectedUsersList", userList);
 
                 //affiche list des users sur la console
                 console.log("Online users after log out/user exits:"); 
@@ -116,6 +119,7 @@ socket.on("exitUser", function(userName) // when user logs out of account in the
 }); 
 
 
+    var fs = require('fs');
 //add user info (username password) to database in JSON format 
 socket.on('newUser', (newUserName, newPassword) => 
 {
@@ -125,7 +129,6 @@ socket.on('newUser', (newUserName, newPassword) =>
     userInfo["isConnected"] = false
     console.log("new user : " + newUserName+ ", password : " + newPassword); 
     var json = JSON.stringify(userInfo); 
-    var fs = require('fs');
 //    fs.writeFile('myjsonfile.json', json, 'utf8', callback);
     fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
     {
@@ -200,6 +203,12 @@ socket.on('newUser', (newUserName, newPassword) =>
                if (usersDataBase.users[i]["userName"] == username && usersDataBase.users[i]["passWord"] == password) 
                {
                   check = true     
+        var loginObject = {};     
+        loginObject['username'] = username;
+        loginObject['check'] = check;
+                io.emit("resultLogin", loginObject)
+                console.log("check login for "+username+ " = " + check)
+        break
                } 
                else 
                {
@@ -219,11 +228,13 @@ socket.on('newUser', (newUserName, newPassword) =>
             
           }
         })
+    
     })
 
 
 socket.on('checkUsername', function(username)
 {
+  console.log("in the check username function")
       fs.readFile('usersDataBase.json', 'utf8', function readFileCallback(err, data)
       {
         var i=0;
@@ -237,11 +248,11 @@ socket.on('checkUsername', function(username)
             usersDataBase = JSON.parse(data);
             while (i<usersDataBase.users.length)
             {
-              // console.log(" usersDataBase.users[i] " + usersDataBase.users[i]["userName"])
+              console.log(" usersDataBase.users[i] " + usersDataBase.users[i]["userName"])
                if (usersDataBase.users[i]["userName"] == username) 
                {
                   check = true     // returns true is username already exists 
-                  var loginObject = {};     
+                  var userNameObject = {};     
                   userNameObject['username'] = username;
                   userNameObject['check'] = check;
                   io.emit("resultUsername", userNameObject)
@@ -255,17 +266,23 @@ socket.on('checkUsername', function(username)
                if (i >= usersDataBase.users.length) 
                {
                   check = false
-                  var loginObject = {};     
-                  loginObject['username'] = username;
-                  loginObject['check'] = check;
-                  io.emit("resultLogin", loginObject)
-                  console.log("check username for "+username+ " = " + check)
                }
-            }   
+               var userNameObject = {};     
+                  userNameObject['username'] = username;
+                  userNameObject['check'] = check;
+                  io.emit("resultUsername", userNameObject)
+                  console.log("check username for "+username+ " = " + check)   
+            }
+                  
           }
       })
   });
-
+  
+  socket.on('getUsersList', function sendUsersList(){   
+      console.log("usersListReauest"); 
+            io.emit("userList", userList);
+            io.emit("connectedUsersList", userList);
+  })
   socket.on('sendSDP', (senderNickname, receiverNickname, type, sdp ) =>
   {
     console.log('SENDING SDP from ' + senderNickname + ' to ' + receiverNickname + ' type: ' + type + ' ' + sdp);
@@ -341,6 +358,7 @@ socket.on('checkUsername', function(username)
 //          })
 
   
+  /*
 socket.on('chatMessageDetection', (senderNickname, receiverNickname, messageContent) => 
 {
   
@@ -350,11 +368,10 @@ socket.on('chatMessageDetection', (senderNickname, receiverNickname, messageCont
     newObject['senderNickname'] = receiverNickname;
     newObject['receiverNickname'] = receiverNickname;
     newObject['messageContent'] = messageContent;
-
      io.emit('chatMessage' , newObject);
     console.log("Sending message to "+ receiverNickname );
-
 })
+*/
 })
 
 
